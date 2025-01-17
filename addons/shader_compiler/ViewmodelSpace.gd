@@ -5,17 +5,23 @@ class_name ViewmodelSpace
 ## 
 ## Useful for viewmodels for wieldables. Can toggle the clipping behavior by setting `disable_viewmodel_clipping`
 
-var _viewmodel_clipping_disabled : bool = true
+@export var viewmodel_fov: float  = 75.0 :
+	get:
+		return viewmodel_fov
+	set(value):
+		RenderingServer.global_shader_parameter_set("viewmodel_fov", value)
+		viewmodel_fov = value
 
 ## When this is checked, it will make it so any childed viewmodel will always be rendered in front of everything else
 @export var disable_viewmodel_clipping : bool = true:
 	get:
-		return _viewmodel_clipping_disabled
+		return disable_viewmodel_clipping
 	set(value):
-		_viewmodel_clipping_disabled = value
 		set_instance_shader_parameter("viewmodel_enabled", value)
+		disable_viewmodel_clipping = value
 
 func _init():
+	RenderingServer.global_shader_parameter_add("viewmodel_fov", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, viewmodel_fov)
 	injected_vars = '''
 	global uniform float viewmodel_fov = 75.0f;
 	instance uniform bool viewmodel_enabled = true;'''
@@ -39,5 +45,5 @@ func _init():
 
 func convert_surfaces():
 	super()
-	if not _viewmodel_clipping_disabled:
-		set_instance_shader_parameter("viewmodel_enabled",_viewmodel_clipping_disabled)
+	if not disable_viewmodel_clipping:
+		set_instance_shader_parameter("viewmodel_enabled",disable_viewmodel_clipping)
